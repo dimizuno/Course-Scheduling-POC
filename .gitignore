@@ -1,0 +1,9 @@
+.idea
+.gradle
+.nb-gradle
+build
+classes
+*.iml
+gradle.properties
+*.log
+/.nb-gradle/
