@@ -3,11 +3,15 @@ import org.chocosolver.solver.Solution;
 import org.chocosolver.solver.Solver;
 import org.chocosolver.solver.constraints.Constraint;
 import org.chocosolver.solver.constraints.nary.alldifferent.conditions.Condition;
+import org.chocosolver.solver.variables.BoolVar;
 import org.chocosolver.solver.variables.IntVar;
+import org.chocosolver.solver.variables.SetVar;
+import org.chocosolver.util.tools.ArrayUtils;
 import util.StringPadding;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.IntStream;
 
 /**
  * Created by the two world leading experts in CP: asekulsk & dkotlovs.
@@ -57,49 +61,55 @@ public class CourseProblemRow {
 //                "BKV", "KI", "MOC", "PAP", "ROB", "SWD"); // 7, 8, 9, 10, 11, 12
 
         // Amount of modules to be considered
-        int n = modules.size();
+        int numberOfCourses = modules.size();
 
         // CS-Model
         Model model = new Model("module problem");
 
         // Variables: modules
-        IntVar[] modulVars = new IntVar[n];
-        for (int i = 0; i < modulVars.length; i++) {
+        IntVar[] modulVars = new IntVar[numberOfCourses];
+        for (int i = 0; i < numberOfCourses; i++) {
             modulVars[i] = model.intVar(modules.get(i), 0, maxSems - 1);
 //            modulVars[i] = model.intVar(modules.get(i), new int[]{0,0,0,1,1,1,2,2,2,3,3,3,4,4,4,5,5,5,6,6,6,7,7,7,8,8,8,9,9,9});
         }
 
         // Variables: credit points
-        IntVar cp = model.intVar("cp", 0, 180); // 150 + 12 + 3 + 15
-        IntVar[] cpVars = new IntVar[n];
-        cpVars[0] = model.intVar(modules.get(0), 5);    // TGI
-        cpVars[1] = model.intVar(modules.get(1), 5);    // TENI
-        cpVars[2] = model.intVar(modules.get(2), 7);    // GMI
-        cpVars[3] = model.intVar(modules.get(3), 7);    // EPR
-        cpVars[4] = model.intVar(modules.get(4), 6);    // LDS
-        cpVars[5] = model.intVar(modules.get(5), 6);    // MIN
-        cpVars[6] = model.intVar(modules.get(6), 5);    // REN
-        cpVars[7] = model.intVar(modules.get(7), 7);    // OPR
-        cpVars[8] = model.intVar(modules.get(8), 6);    // ADS
-        cpVars[9] = model.intVar(modules.get(9), 6);    // THI
-        cpVars[10] = model.intVar(modules.get(10), 6);  // BSY              | premise: 30cp
-        cpVars[11] = model.intVar(modules.get(11), 6);  // INS              | premise: 30cp
-        cpVars[12] = model.intVar(modules.get(12), 6);  // SWT              | premise: 30cp
-        cpVars[13] = model.intVar(modules.get(13), 6);  // DBA              | premise: 30cp
-        cpVars[14] = model.intVar(modules.get(14), 6);  // MCI              | premise: 30cp
-        cpVars[15] = model.intVar(modules.get(15), 6);  // SPIN1 (6 of 12)  | premise: 50cp
-        cpVars[16] = model.intVar(modules.get(16), 6);  // IDB              | premise: 50cp
-        cpVars[17] = model.intVar(modules.get(17), 6);  // INP              | premise: 50cp
-        cpVars[18] = model.intVar(modules.get(18), 6);  // WM1              | premise: 50cp
-        cpVars[19] = model.intVar(modules.get(19), 6);  // WM2              | premise: 50cp
-        cpVars[20] = model.intVar(modules.get(20), 6);  // SPIN2 (6 of 12)  | premise: 50cp
-        cpVars[21] = model.intVar(modules.get(21), 6);  // PPR              | premise: 70cp
-        cpVars[22] = model.intVar(modules.get(22), 6);  // WM3              | premise: 70cp
-        cpVars[23] = model.intVar(modules.get(23), 6);  // WM4              | premise: 70cp
-        cpVars[24] = model.intVar(modules.get(24), 6);  // WM5              | premise: 70cp
-        cpVars[25] = model.intVar(modules.get(25), 12); // BAIN             | premise: 150cp
-        cpVars[26] = model.intVar(modules.get(26), 3);  // KBIN             | premise: 150cp
-        cpVars[27] = model.intVar(modules.get(27), 15); // PPX              | premise: 90cp
+        int[] achievableCreditPoints = new int[]{
+                5, 5, 7, 7, 6,  // TGI, TENI, GMI, EPR, LDS
+                6, 5, 7, 6, 6,  // MIN, REN, OPR, ADS, THI
+                6, 6, 6, 6, 6,  // BSY, INS, SWT, DBA, MCI
+                6, 6, 6, 6, 6,  // SPIN1, IDB, INP, WM1, WM2
+                6, 6, 6, 6, 6,  // SPIN2, PPR, WM3, WM4, WM5,
+                12, 3, 15};     // BAIN, KBIN, PXP
+        IntVar[] cpVars = new IntVar[numberOfCourses];
+        cpVars[0] = model.intVar(5);    // TGI
+        cpVars[1] = model.intVar(5);    // TENI
+        cpVars[2] = model.intVar(7);    // GMI
+        cpVars[3] = model.intVar(7);    // EPR
+        cpVars[4] = model.intVar(6);    // LDS
+        cpVars[5] = model.intVar(6);    // MIN
+        cpVars[6] = model.intVar(5);    // REN
+        cpVars[7] = model.intVar(7);    // OPR
+        cpVars[8] = model.intVar(6);    // ADS
+        cpVars[9] = model.intVar(6);    // THI
+        cpVars[10] = model.intVar(6);   // BSY              | premise: 30cp
+        cpVars[11] = model.intVar(6);   // INS              | premise: 30cp
+        cpVars[12] = model.intVar(6);   // SWT              | premise: 30cp
+        cpVars[13] = model.intVar(6);   // DBA              | premise: 30cp
+        cpVars[14] = model.intVar(6);   // MCI              | premise: 30cp
+        cpVars[15] = model.intVar(6);   // SPIN1 (6 of 12)  | premise: 50cp
+        cpVars[16] = model.intVar(6);   // IDB              | premise: 50cp
+        cpVars[17] = model.intVar(6);   // INP              | premise: 50cp
+        cpVars[18] = model.intVar(6);   // WM1              | premise: 50cp
+        cpVars[19] = model.intVar(6);   // WM2              | premise: 50cp
+        cpVars[20] = model.intVar(6);   // SPIN2 (6 of 12)  | premise: 50cp
+        cpVars[21] = model.intVar(6);   // PPR              | premise: 70cp
+        cpVars[22] = model.intVar(6);   // WM3              | premise: 70cp
+        cpVars[23] = model.intVar(6);   // WM4              | premise: 70cp
+        cpVars[24] = model.intVar(6);   // WM5              | premise: 70cp
+        cpVars[25] = model.intVar(12);  // BAIN             | premise: 150cp
+        cpVars[26] = model.intVar(3);   // KBIN             | premise: 150cp
+        cpVars[27] = model.intVar(15);  // PPX              | premise: 90cp
 
         // BWIN, WS, 6CP
         // BV, WS, 6CP (GMI, EPR, MIN, OPR, ADS, PPR)
@@ -122,21 +132,17 @@ public class CourseProblemRow {
         //////////////////
 
         // Constraints: maximum modules per semester
-        for (int semester = 0; semester < maxSems; semester++) {
-            Constraint[] constraints = new Constraint[modsPerSem + 1];
-            for (int j = 0; j <= modsPerSem; j++) {
-                constraints[j] = model.among(model.intVar(j), modulVars, new int[]{semester});
-            }
-            model.or(constraints).post();
-        }
-
 //        for (int semester = 0; semester < maxSems; semester++) {
-//for (int j = 1; j < )
-//            Constraint const1 = model.among(model.intVar(1), modulVars, new int[]{semester});
-//            Constraint const2 = model.among(model.intVar(2), modulVars, new int[]{semester});
-//            Constraint const3 = model.among(model.intVar(3), modulVars, new int[]{i});
-//            model.or(const1, const2, const3).post();
+//            Constraint[] constraints = new Constraint[modsPerSem + 1];
+//            for (int j = 0; j <= modsPerSem; j++) {
+//                constraints[j] = model.among(model.intVar(j), modulVars, new int[]{semester});
+//            }
+//            model.or(constraints).post();
 //        }
+        for (int semester = 0; semester < maxSems; semester++) {
+            IntVar coursesInTerm = model.intVar("coursesInTerm_" + semester, 0, 3, true);
+            model.count(semester, modulVars, coursesInTerm).post();
+        }
 
 
 
@@ -284,7 +290,32 @@ public class CourseProblemRow {
 //                model.arithm(cpVars[j]).post();
 //            }
 //        }
+//        IntVar cp = model.intVar("cp", 0, 180); // 150 + 12 + 3 + 15
+        for (int semester = 0; semester < maxSems; semester++) {
+//            IntVar pointsInTerm = model.intVar("pointsInTerm_" + semester, 15, 21, true);
+            int[] pointsInTerm = new int[modsPerSem];
+            Arrays.fill(pointsInTerm, 0);
+//            for (int i = 0; i < modulVars.length; i++) {
+//                BoolVar b = model.arithm(modulVars[i], "=", semester).reify();
+//                model.ifThen(b, pointsInTerm.add(cpVars[i]));
+//            }
+//            model.count(semester, modulVars, pointsInTerm).post();
+        }
 
+//        for (int term = 0; term < maxSems; term++) {
+//            IntVar pointsInTerm = model.intVar("pointsInTerm_" + term, 0, 34, true);
+//            for (int i = 0; i < numberOfCourses; i++) {
+//                model.ifThenElse(
+//                        model.arithm(modulVars[i], "=", term),
+//                        model.arithm(points[], "=", achievableCreditPoints[i]),
+//                        model.arithm(points[], "=", 0)
+//                );
+//            }
+//        }
+//
+//        SetVar set = model.setVar("set", new int[]{}, new int[]{6,6,6});
+//        model.member(6, set).post();
+//        model.member(6, set).post();
 
 
         //////////////
@@ -299,6 +330,7 @@ public class CourseProblemRow {
 
         String[] output = new String[maxSems];
         if (solution != null) {
+            System.out.println(solution.toString());
 //            // Remove unnecessary strings from solution
 //            String result = "";
 //            String[] resultArray = solution.toString().split(",");
