@@ -12,7 +12,7 @@ import java.util.List;
 /**
  * Created by the two world leading experts in CP: asekulsk & dkotlovs.
  */
-public class CourseProblemIndex {
+public class CourseScheduling_IndexBased {
 
     public static void main(String[] args) {
         solveModule();
@@ -248,6 +248,11 @@ public class CourseProblemIndex {
 
 
         // Constraints: credit points premise and cycle dependency
+        model.arithm(modulVars[5].div(modsPerSem).intVar(), ">", 0).post(); // MIN (redundant for SS)
+        model.arithm(modulVars[6].div(modsPerSem).intVar(), ">", 0).post(); // REN (redundant for SS)
+        model.arithm(modulVars[7].div(modsPerSem).intVar(), ">", 0).post(); // OPR (redundant for SS)
+        model.arithm(modulVars[8].div(modsPerSem).intVar(), ">", 0).post(); // ADS (redundant for SS)
+        model.arithm(modulVars[9].div(modsPerSem).intVar(), ">", 0).post(); // THI (redundant for SS)
         model.arithm(modulVars[10].div(modsPerSem).intVar(), ">", 1).post(); // BSY (30cp + WS)
         model.arithm(modulVars[11].div(modsPerSem).intVar(), ">", 1).post(); // INS (30cp + WS)
         model.arithm(modulVars[12].div(modsPerSem).intVar(), ">", 1).post(); // SWT (30cp + WS)
@@ -307,10 +312,11 @@ public class CourseProblemIndex {
 //                        model.arithm(modulVars[i], "=", j),
 //                        model.arithm(points[j], "=", achievableCreditPoints[i])
 //                );
-                model.ifThen(
-                        model.arithm(modulVars[i], "=", j),
-                        model.element(points[j], achievableCreditPoints, model.intVar(i))
-                );
+
+//                model.ifThen(
+//                        model.arithm(modulVars[i], "=", j),
+//                        model.element(points[j], achievableCreditPoints, model.intVar(i))
+//                );
 
 //                model.ifThenElse(
 //                        model.arithm(modulVars[i], "=", j),

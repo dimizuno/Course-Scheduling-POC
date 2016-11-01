@@ -11,6 +11,7 @@ import java.util.Arrays;
 /**
  * Created by Dimi on 27.10.2016.
  */
+@Deprecated
 public class CourseProblemNew {
 
     public static void main(String [] args) {

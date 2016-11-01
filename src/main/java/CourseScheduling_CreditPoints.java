@@ -11,7 +11,7 @@ import java.util.List;
 /**
  * Created by Dimi on 30.10.2016.
  */
-public class CourseProblemNew_Index {
+public class CourseScheduling_CreditPoints {
 
     public static void main(String [] args) {
         solveProblem();
@@ -46,42 +46,29 @@ public class CourseProblemNew_Index {
         // a course is either scheduled or not
         BoolVar[] courses = model.boolVarArray("courses", numberOfCourses);
         // which course is bound to a specific term
-        IntVar[][] terms = new IntVar[maxTerms][];
-        for (int i = 0; i < maxTerms; i++) {
-            terms[i] = model.intVarArray("terms_"+i, maxCoursesPerTerm, 0, numberOfCourses - 1, true);
-        }
+//        IntVar[][] terms = new IntVar[maxTerms][];
+//        for (int i = 0; i < maxTerms; i++) {
+//            terms[i] = model.intVarArray("terms_"+i, maxCoursesPerTerm, 0, numberOfCourses - 1, true);
+//        }
+
+        IntVar[] terms = model.intVarArray("terms", maxTerms * maxCoursesPerTerm, 0, numberOfCourses - 1, false);
+
         // credit points per term
         IntVar[][] points = new IntVar[maxTerms][];
         for (int i = 0; i < maxTerms; i++) {
             points[i] = model.intVarArray("points_"+i, maxCoursesPerTerm, 0, 15, true);
         }
 
-        IntVar[] motherfuck = model.intVarArray(maxTerms * maxCoursesPerTerm, 0, numberOfCourses - 1, false);
-
         // CONSTRAINTS
+        model.allDifferentExcept0(terms).post();
         for (int j = 0; j < maxTerms; j++) {
             // a course is scheduled, if it is 'bound' to a store
             for (int i = 0; i < maxCoursesPerTerm; i++) {
-                model.element(model.intVar(1), courses, terms[j][i], 0).post();
-                model.arithm(terms[j][i], "=", motherfuck[(j * maxCoursesPerTerm) + i]).post();
-            }
-            model.allDifferentExcept0(terms[j]);
-            // Compute credit points for each term
-            for (int i = 0; i < maxCoursesPerTerm; i++) {
-                model.element(points[j][i], achievableCreditPoints, terms[j][i], 0).post();
+                model.element(model.intVar(1), courses, terms[(j * maxCoursesPerTerm) + i], 0).post();
+                model.element(points[j][i], achievableCreditPoints, terms[(j * maxCoursesPerTerm) + i], 0).post(); // Compute credit points for each term
             }
             model.sum(points[j], ">=", 15).post();
         }
-        model.allDifferentExcept0(motherfuck).post();
-
-
-
-
-
-
-
-
-
 
         Solver solver = model.getSolver();
         solver.showShortStatistics();
@@ -93,8 +80,9 @@ public class CourseProblemNew_Index {
         String[] output = new String[maxTerms];
         if (solution != null) {
             for (int i = 0; i < maxTerms; i++) {
-                for (IntVar course : terms[i]) {
-                    String modulName = StringPadding.rightPad(modules.get(course.getValue()), 5);
+                int start = i * maxCoursesPerTerm;
+                for (int j = start; j < (start + maxCoursesPerTerm); j++) {
+                    String modulName = StringPadding.rightPad(modules.get(terms[j].getValue()), 5);
                     if (output[i] != null) {
                         output[i] += modulName + "   ";
                     } else {

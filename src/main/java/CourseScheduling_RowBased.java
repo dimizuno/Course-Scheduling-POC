@@ -16,7 +16,7 @@ import java.util.stream.IntStream;
 /**
  * Created by the two world leading experts in CP: asekulsk & dkotlovs.
  */
-public class CourseProblemRow {
+public class CourseScheduling_RowBased {
 
     public static void main(String[] args) {
         solveModule();
@@ -127,23 +127,16 @@ public class CourseProblemRow {
         // SWD, SS, 6CP (SWT, DBA, MCI, IDB)
 
 
+
         //////////////////
         // CONSTRAINTS: //
         //////////////////
 
         // Constraints: maximum modules per semester
-//        for (int semester = 0; semester < maxSems; semester++) {
-//            Constraint[] constraints = new Constraint[modsPerSem + 1];
-//            for (int j = 0; j <= modsPerSem; j++) {
-//                constraints[j] = model.among(model.intVar(j), modulVars, new int[]{semester});
-//            }
-//            model.or(constraints).post();
-//        }
         for (int semester = 0; semester < maxSems; semester++) {
             IntVar coursesInTerm = model.intVar("coursesInTerm_" + semester, 0, 3, true);
             model.count(semester, modulVars, coursesInTerm).post();
         }
-
 
 
         // Constraints: Module Dependencies
@@ -216,12 +209,14 @@ public class CourseProblemRow {
         model.arithm(modulVars[22], "<=", modulVars[24]).post(); // WM3.row <= WM5.row
         // WM4
         model.arithm(modulVars[23], "<=", modulVars[24]).post(); // WM4.row <= WM5.row
-        // BAIN: All modules, PPX
+        // BAIN/KBIN: All modules, PPX
         for (int i = 0; i <= 24; i++) {
             model.arithm(modulVars[25], ">", modulVars[i]).post();
+            model.arithm(modulVars[26], ">", modulVars[i]).post();
         }
         model.arithm(modulVars[25], ">=", modulVars[27]).post(); // BAIN.row >= PXX.row
-        model.arithm(modulVars[25], "=", modulVars[26]).post(); // BAIN.row = KBIN.row
+        model.arithm(modulVars[26], ">=", modulVars[27]).post(); // KBIN.row >= PXX.row
+        model.arithm(modulVars[25], "=", modulVars[26]).post();  // BAIN.row = KBIN.row
         // PPX: all modules from the first 3 semesters
         for (int i = 0; i <= 14; i++) {
             model.arithm(modulVars[27], ">", modulVars[i]).post();
@@ -257,11 +252,11 @@ public class CourseProblemRow {
 
 
         // Constraints: credit points premise and cycle dependency
-        model.arithm(modulVars[5], ">", 0).post(); // TGI (redundant for SS)
-        model.arithm(modulVars[6], ">", 0).post(); // TENI (redundant for SS)
-        model.arithm(modulVars[7], ">", 0).post(); // GMI (redundant for SS)
-        model.arithm(modulVars[8], ">", 0).post(); // EPR (redundant for SS)
-        model.arithm(modulVars[9], ">", 0).post(); // LDS (redundant for SS)
+        model.arithm(modulVars[5], ">", 0).post(); // MIN (redundant for SS)
+        model.arithm(modulVars[6], ">", 0).post(); // REN (redundant for SS)
+        model.arithm(modulVars[7], ">", 0).post(); // OPR (redundant for SS)
+        model.arithm(modulVars[8], ">", 0).post(); // ADS (redundant for SS)
+        model.arithm(modulVars[9], ">", 0).post(); // THI (redundant for SS)
         model.arithm(modulVars[10], ">", 1).post(); // BSY (30cp + WS)
         model.arithm(modulVars[11], ">", 1).post(); // INS (30cp + WS)
         model.arithm(modulVars[12], ">", 1).post(); // SWT (30cp + WS)
@@ -325,23 +320,9 @@ public class CourseProblemRow {
         Solver solver = model.getSolver();
         solver.showShortStatistics();
         Solution solution = solver.findSolution();
-//        model.setObjective(Model.MINIMIZE, modulVars[25]);
-//        Solution solution = model.getSolver().findOptimalSolution(modulVars[25], Model.MINIMIZE);
 
         String[] output = new String[maxSems];
         if (solution != null) {
-            System.out.println(solution.toString());
-//            // Remove unnecessary strings from solution
-//            String result = "";
-//            String[] resultArray = solution.toString().split(",");
-//            for (String s : resultArray) {
-//                if (!s.contains("TMP") && !s.contains("div_exp") && !s.contains("sum_exp") && !s.contains("mod_exp")) {
-//                    result += s;
-//                }
-//            }
-//            System.out.println(result.trim());
-
-            // New output
             for (IntVar modulVar : modulVars) {
                 String rowString = output[solution.getIntVal(modulVar)];
                 int row = solution.getIntVal(modulVar);
@@ -365,20 +346,7 @@ public class CourseProblemRow {
 
 //        List<Solution> solutions = solver.findAllSolutions();
 //        if(solutions != null) {
-//            int no = 0;
-//            for(Solution sol : solutions) {
-//                no++;
-//                // Remove unnecessary strings from solution
-//                String result = "";
-//                String[] resultArray = sol.toString().split(",");
-//                for (String s : resultArray) {
-//                    if (!s.contains("TMP") && !s.contains("div_exp") && !s.contains("sum_exp") && !s.contains("mod_exp")) {
-//                        result += s;
-//                    }
-//                }
-//                System.out.println(no + ". " + result.trim());
-//            }
-//            System.out.println("Found " + solutions.size() + " solutions.");
+//            System.out.println(solutions.size());
 //        }
 
     }
