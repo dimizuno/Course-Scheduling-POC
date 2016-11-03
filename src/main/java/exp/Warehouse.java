@@ -1,3 +1,5 @@
+package exp;
+
 import org.chocosolver.solver.Model;
 import org.chocosolver.solver.ResolutionPolicy;
 import org.chocosolver.solver.Solution;
@@ -111,7 +113,7 @@ public class Warehouse {
         st.append("Solution #").append(model.getSolver().getSolutionCount()).append("\n");
         for (int i = 0; i < W; i++) {
             if (open[i].getValue() > 0) {
-                st.append(String.format("\tWarehouse %d supplies customers : ", (i + 1)));
+                st.append(String.format("\texp.Warehouse %d supplies customers : ", (i + 1)));
                 for (int j = 0; j < S; j++) {
                     if (supplier[j].getValue() == (i + 1)) {
                         st.append(String.format("%d ", (j + 1)));
