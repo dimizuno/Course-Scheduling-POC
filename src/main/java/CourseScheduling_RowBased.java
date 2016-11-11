@@ -23,11 +23,11 @@ public class CourseScheduling_RowBased {
 
     private static void solveModule() {
 
-        // Maximum modules per semester.
-        int modsPerSem = 3;
+        // Maximum courses per term
+        int coursesPerTerm = 3;
 
-        // Maximum semesters over all
-        int maxSems = 10;
+        // Maximum terms over all
+        int maxTerms = 10;
 
 
         ////////////
@@ -63,13 +63,12 @@ public class CourseScheduling_RowBased {
         int numberOfCourses = modules.size();
 
         // CS-Model
-        Model model = new Model("module problem");
+        Model model = new Model("CourseScheduling");
 
         // Variables: modules
         IntVar[] modulVars = new IntVar[numberOfCourses];
         for (int i = 0; i < numberOfCourses; i++) {
-            modulVars[i] = model.intVar(modules.get(i), 0, maxSems - 1);
-//            modulVars[i] = model.intVar(modules.get(i), new int[]{0,0,0,1,1,1,2,2,2,3,3,3,4,4,4,5,5,5,6,6,6,7,7,7,8,8,8,9,9,9});
+            modulVars[i] = model.intVar(modules.get(i), 0, maxTerms - 1);
         }
 
         // Variables: credit points
@@ -110,6 +109,10 @@ public class CourseScheduling_RowBased {
         cpVars[26] = model.intVar(3);   // KBIN             | premise: 150cp
         cpVars[27] = model.intVar(15);  // PPX              | premise: 90cp
 
+        int[] courseNumbers = new int[]{0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27};
+        SetVar[] scheduledCourses = model.setVarArray("scheduledCourses", maxTerms, new int[]{}, courseNumbers);
+        IntVar[] points = model.intVarArray(maxTerms, 15, 21);
+
         // BWIN, WS, 6CP
         // BV, WS, 6CP (GMI, EPR, MIN, OPR, ADS, PPR)
         // ITS, WS, 6CP
@@ -132,10 +135,10 @@ public class CourseScheduling_RowBased {
         //////////////////
 
         // Constraints: maximum modules per semester
-        for (int semester = 0; semester < maxSems; semester++) {
-            IntVar coursesInTerm = model.intVar("coursesInTerm_" + semester, 0, 3, true);
-            model.count(semester, modulVars, coursesInTerm).post();
-        }
+//        for (int semester = 0; semester < maxTerms; semester++) {
+//            IntVar coursesInTerm = model.intVar("coursesInTerm_" + semester, 0, coursesPerTerm, true);
+//            model.count(semester, modulVars, coursesInTerm).post();
+//        }
 
 
         // Constraints: Module Dependencies
@@ -222,7 +225,6 @@ public class CourseScheduling_RowBased {
         }
 
 
-
         // Constraints: WS cycle dependency (modules are only accessible during winter)
         model.arithm(modulVars[0].mod(2).intVar(), "=", 0).post(); // TGI
         model.arithm(modulVars[1].mod(2).intVar(), "=", 0).post(); // TENI
@@ -247,7 +249,6 @@ public class CourseScheduling_RowBased {
         model.arithm(modulVars[16].mod(2).intVar(), "=", 1).post(); // IDB
         model.arithm(modulVars[17].mod(2).intVar(), "=", 1).post(); // INP
         model.arithm(modulVars[27].mod(2).intVar(), "=", 1).post(); // PXP
-
 
 
         // Constraints: credit points premise and cycle dependency
@@ -275,41 +276,73 @@ public class CourseScheduling_RowBased {
         model.arithm(modulVars[26], ">", 4).post(); // KBIN (150cp)
         model.arithm(modulVars[27], ">", 2).post(); // PXP (90cp + SS)
 
-//        IntVar[] cpCounts = new IntVar[5];
-//        for (int i = 10; i <= 14; i++) {  // "BSY", "INS", "SWT", "DBA", "MCI"
-//            cpCounts[i - 10] = model.intVar("cpCounts_" + i, 0);
-//            BoolVar[] passedModules = new BoolVar[modulVars.length];
-//            for (int j = 0; j < modulVars.length; j++) {
-//                passedModules[j] = model.arithm(modulVars[j], "<", modulVars[i]).reify();
-//                model.arithm(cpVars[j]).post();
-//            }
-//        }
-//        IntVar cp = model.intVar("cp", 0, 180); // 150 + 12 + 3 + 15
-        for (int semester = 0; semester < maxSems; semester++) {
-//            IntVar pointsInTerm = model.intVar("pointsInTerm_" + semester, 15, 21, true);
-            int[] pointsInTerm = new int[modsPerSem];
-            Arrays.fill(pointsInTerm, 0);
-//            for (int i = 0; i < modulVars.length; i++) {
-//                BoolVar b = model.arithm(modulVars[i], "=", semester).reify();
-//                model.ifThen(b, pointsInTerm.add(cpVars[i]));
-//            }
-//            model.count(semester, modulVars, pointsInTerm).post();
+        // Constraints: calculate credit points
+        for (int term = 0; term < maxTerms; term++) {
+
+            // Check which courses are scheduled to which term
+            for (int course = 0; course < numberOfCourses; course++) {
+                model.ifThenElse(
+                        model.arithm(modulVars[course], "=", term),
+                        model.member(course, scheduledCourses[term]),
+                        model.notMember(course, scheduledCourses[term])
+                );
+            }
+
+            // Calculate achieved credit points for each term
+            model.sumElements(scheduledCourses[term], achievableCreditPoints, points[term]).post();
         }
 
-//        for (int term = 0; term < maxSems; term++) {
-//            IntVar pointsInTerm = model.intVar("pointsInTerm_" + term, 0, 34, true);
-//            for (int i = 0; i < numberOfCourses; i++) {
-//                model.ifThenElse(
-//                        model.arithm(modulVars[i], "=", term),
-//                        model.arithm(points[], "=", achievableCreditPoints[i]),
-//                        model.arithm(points[], "=", 0)
-//                );
-//            }
-//        }
-//
-//        SetVar set = model.setVar("set", new int[]{}, new int[]{6,6,6});
-//        model.member(6, set).post();
-//        model.member(6, set).post();
+        // Constraints: credit points premise
+        for (int term = 1; term < maxTerms; term++) {
+            IntVar[] p = new IntVar[term];
+            for (int k = term - 1; k >= 0; k--) {
+                p[k] = points[k];
+            }
+            Constraint min30Points = model.sum(p, ">=", 30);
+            Constraint min50Points = model.sum(p, ">=", 50);
+            Constraint min70Points = model.sum(p, ">=", 70);
+            Constraint min90Points = model.sum(p, ">=", 90);
+            Constraint min150Points = model.sum(p, ">=", 150);
+
+            BoolVar BSY = model.arithm(modulVars[10], "=", term).reify();
+            BoolVar INS = model.arithm(modulVars[11], "=", term).reify();
+            BoolVar SWT = model.arithm(modulVars[12], "=", term).reify();
+            BoolVar DBA = model.arithm(modulVars[13], "=", term).reify();
+            BoolVar MCI = model.arithm(modulVars[14], "=", term).reify();
+            BoolVar SPIN1 = model.arithm(modulVars[15], "=", term).reify();
+            BoolVar IDB = model.arithm(modulVars[16], "=", term).reify();
+            BoolVar INP = model.arithm(modulVars[17], "=", term).reify();
+            BoolVar WM1 = model.arithm(modulVars[18], "=", term).reify();
+            BoolVar WM2 = model.arithm(modulVars[19], "=", term).reify();
+            BoolVar SPIN2 = model.arithm(modulVars[20], "=", term).reify();
+            BoolVar PPR = model.arithm(modulVars[21], "=", term).reify();
+            BoolVar WM3 = model.arithm(modulVars[22], "=", term).reify();
+            BoolVar WM4 = model.arithm(modulVars[23], "=", term).reify();
+            BoolVar WM5 = model.arithm(modulVars[24], "=", term).reify();
+            BoolVar BAIN = model.arithm(modulVars[25], "=", term).reify();
+            BoolVar KBIN = model.arithm(modulVars[26], "=", term).reify();
+            BoolVar PPX = model.arithm(modulVars[27], "=", term).reify();
+
+            model.ifThen(BSY, min30Points);
+            model.ifThen(INS, min30Points);
+            model.ifThen(SWT, min30Points);
+            model.ifThen(DBA, min30Points);
+            model.ifThen(MCI, min30Points);
+            model.ifThen(SPIN1, min50Points);
+            model.ifThen(IDB, min50Points);
+            model.ifThen(INP, min50Points);
+            model.ifThen(WM1, min50Points);
+            model.ifThen(WM2, min50Points);
+            model.ifThen(SPIN2, min50Points);
+            model.ifThen(PPR, min70Points);
+            model.ifThen(WM3, min70Points);
+            model.ifThen(WM4, min70Points);
+            model.ifThen(WM5, min70Points);
+            model.ifThen(BAIN, min150Points);
+            model.ifThen(KBIN, min150Points);
+            model.ifThen(PPX, min90Points);
+        }
+
 
 
         //////////////
@@ -320,7 +353,7 @@ public class CourseScheduling_RowBased {
         solver.showShortStatistics();
         Solution solution = solver.findSolution();
 
-        String[] output = new String[maxSems];
+        String[] output = new String[maxTerms];
         if (solution != null) {
             for (IntVar modulVar : modulVars) {
                 String rowString = output[solution.getIntVal(modulVar)];
@@ -332,7 +365,7 @@ public class CourseScheduling_RowBased {
                     output[row] = modulName + "   ";
                 }
             }
-            for (int i = 0; i < maxSems; i++) {
+            for (int i = 0; i < maxTerms; i++) {
                 if (output[i] != null) {
                     System.out.println(StringPadding.leftPad("" + (i + 1), 2) + ". Sem:   " + output[i]);
                 } else {

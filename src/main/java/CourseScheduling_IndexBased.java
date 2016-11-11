@@ -21,10 +21,10 @@ public class CourseScheduling_IndexBased {
     private static void solveModule() {
 
         // Maximum modules per semester.
-        int modsPerSem = 3;
+        int coursesPerTerm = 3;
 
         // Maximum semesters over all
-        int maxSems = 10;
+        int maxTerms = 10;
 
 
         ////////////
@@ -65,7 +65,7 @@ public class CourseScheduling_IndexBased {
         // Variables: modules
         IntVar[] modulVars = new IntVar[numberOfCourses];
         for (int i = 0; i < numberOfCourses; i++) {
-            modulVars[i] = model.intVar(modules.get(i), 0, (maxSems * modsPerSem) - 1);
+            modulVars[i] = model.intVar(modules.get(i), 0, (maxTerms * coursesPerTerm) - 1);
         }
 
         // Variables: credit points
@@ -135,45 +135,45 @@ public class CourseScheduling_IndexBased {
 
         // Constraints: Module Dependencies
         // MIN: GMI
-        setup_dependency2(model, modulVars[2], modulVars[5], modsPerSem);
+        setup_dependency2(model, modulVars[2], modulVars[5], coursesPerTerm);
         // OPR: EPR
-        setup_dependency2(model, modulVars[3], modulVars[7], modsPerSem);
+        setup_dependency2(model, modulVars[3], modulVars[7], coursesPerTerm);
         // ADS: EPR, LDS
-        setup_dependency2(model, modulVars[3], modulVars[8], modsPerSem);
-        setup_dependency2(model, modulVars[4], modulVars[8], modsPerSem);
+        setup_dependency2(model, modulVars[3], modulVars[8], coursesPerTerm);
+        setup_dependency2(model, modulVars[4], modulVars[8], coursesPerTerm);
         // THI: EPR, LDS
-        setup_dependency2(model, modulVars[3], modulVars[9], modsPerSem);
-        setup_dependency2(model, modulVars[4], modulVars[9], modsPerSem);
+        setup_dependency2(model, modulVars[3], modulVars[9], coursesPerTerm);
+        setup_dependency2(model, modulVars[4], modulVars[9], coursesPerTerm);
         // BSY: TGI
-        setup_dependency2(model, modulVars[0], modulVars[10], modsPerSem);
+        setup_dependency2(model, modulVars[0], modulVars[10], coursesPerTerm);
         // INS: EPR, OPR
-        setup_dependency2(model, modulVars[3], modulVars[11], modsPerSem);
-        setup_dependency2(model, modulVars[7], modulVars[11], modsPerSem);
+        setup_dependency2(model, modulVars[3], modulVars[11], coursesPerTerm);
+        setup_dependency2(model, modulVars[7], modulVars[11], coursesPerTerm);
         // SWT: GMI, EPR, LDS, OPR, ADS
-        setup_dependency2(model, modulVars[2], modulVars[12], modsPerSem);
-        setup_dependency2(model, modulVars[3], modulVars[12], modsPerSem);
-        setup_dependency2(model, modulVars[4], modulVars[12], modsPerSem);
-        setup_dependency2(model, modulVars[7], modulVars[12], modsPerSem);
-        setup_dependency2(model, modulVars[8], modulVars[12], modsPerSem);
+        setup_dependency2(model, modulVars[2], modulVars[12], coursesPerTerm);
+        setup_dependency2(model, modulVars[3], modulVars[12], coursesPerTerm);
+        setup_dependency2(model, modulVars[4], modulVars[12], coursesPerTerm);
+        setup_dependency2(model, modulVars[7], modulVars[12], coursesPerTerm);
+        setup_dependency2(model, modulVars[8], modulVars[12], coursesPerTerm);
         // DBA: EPR, OPR
-        setup_dependency2(model, modulVars[3], modulVars[13], modsPerSem);
-        setup_dependency2(model, modulVars[7], modulVars[13], modsPerSem);
+        setup_dependency2(model, modulVars[3], modulVars[13], coursesPerTerm);
+        setup_dependency2(model, modulVars[7], modulVars[13], coursesPerTerm);
         // MCI: EPR, OPR
-        setup_dependency2(model, modulVars[3], modulVars[14], modsPerSem);
-        setup_dependency2(model, modulVars[7], modulVars[14], modsPerSem);
+        setup_dependency2(model, modulVars[3], modulVars[14], coursesPerTerm);
+        setup_dependency2(model, modulVars[7], modulVars[14], coursesPerTerm);
         // SPIN1: GMI, EPR, LDS, OPR, ADS, SWT, MCI
-        setup_dependency2(model, modulVars[2], modulVars[15], modsPerSem);
-        setup_dependency2(model, modulVars[3], modulVars[15], modsPerSem);
-        setup_dependency2(model, modulVars[4], modulVars[15], modsPerSem);
-        setup_dependency2(model, modulVars[7], modulVars[15], modsPerSem);
-        setup_dependency2(model, modulVars[8], modulVars[15], modsPerSem);
-        setup_dependency2(model, modulVars[12], modulVars[15], modsPerSem);
-        setup_dependency2(model, modulVars[14], modulVars[15], modsPerSem);
+        setup_dependency2(model, modulVars[2], modulVars[15], coursesPerTerm);
+        setup_dependency2(model, modulVars[3], modulVars[15], coursesPerTerm);
+        setup_dependency2(model, modulVars[4], modulVars[15], coursesPerTerm);
+        setup_dependency2(model, modulVars[7], modulVars[15], coursesPerTerm);
+        setup_dependency2(model, modulVars[8], modulVars[15], coursesPerTerm);
+        setup_dependency2(model, modulVars[12], modulVars[15], coursesPerTerm);
+        setup_dependency2(model, modulVars[14], modulVars[15], coursesPerTerm);
         // IDB: EPR, OPR, INS, DBA
-        setup_dependency2(model, modulVars[3], modulVars[16], modsPerSem);
-        setup_dependency2(model, modulVars[7], modulVars[16], modsPerSem);
-        setup_dependency2(model, modulVars[11], modulVars[16], modsPerSem);
-        setup_dependency2(model, modulVars[13], modulVars[16], modsPerSem);
+        setup_dependency2(model, modulVars[3], modulVars[16], coursesPerTerm);
+        setup_dependency2(model, modulVars[7], modulVars[16], coursesPerTerm);
+        setup_dependency2(model, modulVars[11], modulVars[16], coursesPerTerm);
+        setup_dependency2(model, modulVars[13], modulVars[16], coursesPerTerm);
         // WM1
         model.arithm(modulVars[18], "<", modulVars[19]).post(); // WM1 < WM2
         model.arithm(modulVars[18], "<", modulVars[22]).post(); // WM1 < WM3
@@ -184,20 +184,20 @@ public class CourseScheduling_IndexBased {
         model.arithm(modulVars[19], "<", modulVars[23]).post(); // WM2 < WM4
         model.arithm(modulVars[19], "<", modulVars[24]).post(); // WM2 < WM5
         // SPIN2: GMI, EPR, LDS, OPR, ADS, SWT, MCI, SPIN1
-        setup_dependency2(model, modulVars[2], modulVars[20], modsPerSem);
-        setup_dependency2(model, modulVars[3], modulVars[20], modsPerSem);
-        setup_dependency2(model, modulVars[4], modulVars[20], modsPerSem);
-        setup_dependency2(model, modulVars[7], modulVars[20], modsPerSem);
-        setup_dependency2(model, modulVars[8], modulVars[20], modsPerSem);
-        setup_dependency2(model, modulVars[12], modulVars[20], modsPerSem);
-        setup_dependency2(model, modulVars[14], modulVars[20], modsPerSem);
-        setup_dependency2(model, modulVars[15], modulVars[20], modsPerSem);
+        setup_dependency2(model, modulVars[2], modulVars[20], coursesPerTerm);
+        setup_dependency2(model, modulVars[3], modulVars[20], coursesPerTerm);
+        setup_dependency2(model, modulVars[4], modulVars[20], coursesPerTerm);
+        setup_dependency2(model, modulVars[7], modulVars[20], coursesPerTerm);
+        setup_dependency2(model, modulVars[8], modulVars[20], coursesPerTerm);
+        setup_dependency2(model, modulVars[12], modulVars[20], coursesPerTerm);
+        setup_dependency2(model, modulVars[14], modulVars[20], coursesPerTerm);
+        setup_dependency2(model, modulVars[15], modulVars[20], coursesPerTerm);
         model.arithm(modulVars[20], "=", modulVars[15].add(3).intVar()).post(); // SPIN2 has to be right after SPIN1
         // PPR: EPR, LDS, OPR, ADS
-        setup_dependency2(model, modulVars[3], modulVars[21], modsPerSem);
-        setup_dependency2(model, modulVars[4], modulVars[21], modsPerSem);
-        setup_dependency2(model, modulVars[7], modulVars[21], modsPerSem);
-        setup_dependency2(model, modulVars[8], modulVars[21], modsPerSem);
+        setup_dependency2(model, modulVars[3], modulVars[21], coursesPerTerm);
+        setup_dependency2(model, modulVars[4], modulVars[21], coursesPerTerm);
+        setup_dependency2(model, modulVars[7], modulVars[21], coursesPerTerm);
+        setup_dependency2(model, modulVars[8], modulVars[21], coursesPerTerm);
         // WM3
         model.arithm(modulVars[22], "<", modulVars[23]).post(); // WM3 < WM4
         model.arithm(modulVars[22], "<", modulVars[24]).post(); // WM3 < WM5
@@ -205,72 +205,72 @@ public class CourseScheduling_IndexBased {
         model.arithm(modulVars[23], "<", modulVars[24]).post(); // WM4 < WM5
         // BAIN: All modules, PPX
         for (int i = 0; i <= 24; i++) {
-            setup_dependency2(model, modulVars[i], modulVars[25], modsPerSem);
+            setup_dependency2(model, modulVars[i], modulVars[25], coursesPerTerm);
         }
-        IntVar rowB = modulVars[25].div(modsPerSem).intVar();
-        IntVar rowK = modulVars[26].div(modsPerSem).intVar();
-        IntVar rowP = modulVars[27].div(modsPerSem).intVar();
+        IntVar rowB = modulVars[25].div(coursesPerTerm).intVar();
+        IntVar rowK = modulVars[26].div(coursesPerTerm).intVar();
+        IntVar rowP = modulVars[27].div(coursesPerTerm).intVar();
         model.arithm(rowB, ">=", rowP).post(); // BAIN.row >= PXX.row
         model.arithm(rowB, "=", rowK).post(); // BAIN.row = KBIN.row
         model.arithm(modulVars[25], "<", modulVars[26]).post(); // BAIN < KBIN
         // PPX: all modules from the first 3 semesters
         for (int i = 0; i <= 14; i++) {
-            setup_dependency2(model, modulVars[i], modulVars[27], modsPerSem);
+            setup_dependency2(model, modulVars[i], modulVars[27], coursesPerTerm);
         }
 
 
 
         // Constraints: WS cycle dependency (modules are only accessible during winter)
-        setupCycleDependencyWS(model, modulVars[0], modsPerSem); // TGI
-        setupCycleDependencyWS(model, modulVars[1], modsPerSem); // TENI
-        setupCycleDependencyWS(model, modulVars[2], modsPerSem); // GMI
-        setupCycleDependencyWS(model, modulVars[3], modsPerSem); // EPR
-        setupCycleDependencyWS(model, modulVars[4], modsPerSem); // LDS
-        setupCycleDependencyWS(model, modulVars[10], modsPerSem); // BSY
-        setupCycleDependencyWS(model, modulVars[11], modsPerSem); // INS
-        setupCycleDependencyWS(model, modulVars[12], modsPerSem); // SWT
-        setupCycleDependencyWS(model, modulVars[13], modsPerSem); // DBA
-        setupCycleDependencyWS(model, modulVars[14], modsPerSem); // MCI
-        setupCycleDependencyWS(model, modulVars[20], modsPerSem); // SPIN2
-        setupCycleDependencyWS(model, modulVars[21], modsPerSem); // PPR
+        setupCycleDependencyWS(model, modulVars[0], coursesPerTerm); // TGI
+        setupCycleDependencyWS(model, modulVars[1], coursesPerTerm); // TENI
+        setupCycleDependencyWS(model, modulVars[2], coursesPerTerm); // GMI
+        setupCycleDependencyWS(model, modulVars[3], coursesPerTerm); // EPR
+        setupCycleDependencyWS(model, modulVars[4], coursesPerTerm); // LDS
+        setupCycleDependencyWS(model, modulVars[10], coursesPerTerm); // BSY
+        setupCycleDependencyWS(model, modulVars[11], coursesPerTerm); // INS
+        setupCycleDependencyWS(model, modulVars[12], coursesPerTerm); // SWT
+        setupCycleDependencyWS(model, modulVars[13], coursesPerTerm); // DBA
+        setupCycleDependencyWS(model, modulVars[14], coursesPerTerm); // MCI
+        setupCycleDependencyWS(model, modulVars[20], coursesPerTerm); // SPIN2
+        setupCycleDependencyWS(model, modulVars[21], coursesPerTerm); // PPR
 
         // Constraints: SS cycle dependency (modules are only accessible during summer)
-        setupCycleDependencySS(model, modulVars[5], modsPerSem); // MIN
-        setupCycleDependencySS(model, modulVars[6], modsPerSem); // REN
-        setupCycleDependencySS(model, modulVars[7], modsPerSem); // OPR
-        setupCycleDependencySS(model, modulVars[8], modsPerSem); // ADS
-        setupCycleDependencySS(model, modulVars[9], modsPerSem); // THI
-        setupCycleDependencySS(model, modulVars[15], modsPerSem); // SPIN1
-        setupCycleDependencySS(model, modulVars[16], modsPerSem); // IDB
-        setupCycleDependencySS(model, modulVars[17], modsPerSem); // INP
-        setupCycleDependencySS(model, modulVars[27], modsPerSem); // PXP
+        setupCycleDependencySS(model, modulVars[5], coursesPerTerm); // MIN
+        setupCycleDependencySS(model, modulVars[6], coursesPerTerm); // REN
+        setupCycleDependencySS(model, modulVars[7], coursesPerTerm); // OPR
+        setupCycleDependencySS(model, modulVars[8], coursesPerTerm); // ADS
+        setupCycleDependencySS(model, modulVars[9], coursesPerTerm); // THI
+        setupCycleDependencySS(model, modulVars[15], coursesPerTerm); // SPIN1
+        setupCycleDependencySS(model, modulVars[16], coursesPerTerm); // IDB
+        setupCycleDependencySS(model, modulVars[17], coursesPerTerm); // INP
+        setupCycleDependencySS(model, modulVars[27], coursesPerTerm); // PXP
 
 
 
         // Constraints: credit points premise and cycle dependency
-        model.arithm(modulVars[5].div(modsPerSem).intVar(), ">", 0).post(); // MIN (redundant for SS)
-        model.arithm(modulVars[6].div(modsPerSem).intVar(), ">", 0).post(); // REN (redundant for SS)
-        model.arithm(modulVars[7].div(modsPerSem).intVar(), ">", 0).post(); // OPR (redundant for SS)
-        model.arithm(modulVars[8].div(modsPerSem).intVar(), ">", 0).post(); // ADS (redundant for SS)
-        model.arithm(modulVars[9].div(modsPerSem).intVar(), ">", 0).post(); // THI (redundant for SS)
-        model.arithm(modulVars[10].div(modsPerSem).intVar(), ">", 1).post(); // BSY (30cp + WS)
-        model.arithm(modulVars[11].div(modsPerSem).intVar(), ">", 1).post(); // INS (30cp + WS)
-        model.arithm(modulVars[12].div(modsPerSem).intVar(), ">", 1).post(); // SWT (30cp + WS)
-        model.arithm(modulVars[13].div(modsPerSem).intVar(), ">", 1).post(); // DBA (30cp + WS)
-        model.arithm(modulVars[14].div(modsPerSem).intVar(), ">", 1).post(); // MCI (30cp + WS)
-        model.arithm(modulVars[15].div(modsPerSem).intVar(), ">", 2).post(); // SPIN1 (50cp + SS)
-        model.arithm(modulVars[16].div(modsPerSem).intVar(), ">", 2).post(); // IDB (50cp + SS)
-        model.arithm(modulVars[17].div(modsPerSem).intVar(), ">", 2).post(); // INP (50cp + SS)
-        model.arithm(modulVars[18].div(modsPerSem).intVar(), ">", 1).post(); // WM1 (50cp/70cp)
-        model.arithm(modulVars[19].div(modsPerSem).intVar(), ">", 1).post(); // WM2 (50cp/70cp)
-        model.arithm(modulVars[20].div(modsPerSem).intVar(), ">", 3).post(); // SPIN2 (50cp + SPIN1)
-        model.arithm(modulVars[21].div(modsPerSem).intVar(), ">", 1).post(); // PPR (70cp + WS)
-        model.arithm(modulVars[22].div(modsPerSem).intVar(), ">", 1).post(); // WM3 (50cp/70cp)
-        model.arithm(modulVars[23].div(modsPerSem).intVar(), ">", 1).post(); // WM4 (50cp/70cp)
-        model.arithm(modulVars[24].div(modsPerSem).intVar(), ">", 1).post(); // WM5 (50cp/70cp)
-        model.arithm(modulVars[25].div(modsPerSem).intVar(), ">", 4).post(); // BAIN (150cp)
-        model.arithm(modulVars[26].div(modsPerSem).intVar(), ">", 4).post(); // KBIN (150cp)
-        model.arithm(modulVars[27].div(modsPerSem).intVar(), ">", 2).post(); // PXP (90cp + SS)
+        model.arithm(modulVars[5].div(coursesPerTerm).intVar(), ">", 0).post(); // MIN (redundant for SS)
+        model.arithm(modulVars[6].div(coursesPerTerm).intVar(), ">", 0).post(); // REN (redundant for SS)
+        model.arithm(modulVars[7].div(coursesPerTerm).intVar(), ">", 0).post(); // OPR (redundant for SS)
+        model.arithm(modulVars[8].div(coursesPerTerm).intVar(), ">", 0).post(); // ADS (redundant for SS)
+        model.arithm(modulVars[9].div(coursesPerTerm).intVar(), ">", 0).post(); // THI (redundant for SS)
+        model.arithm(modulVars[10].div(coursesPerTerm).intVar(), ">", 1).post(); // BSY (30cp + WS)
+        model.arithm(modulVars[11].div(coursesPerTerm).intVar(), ">", 1).post(); // INS (30cp + WS)
+        model.arithm(modulVars[12].div(coursesPerTerm).intVar(), ">", 1).post(); // SWT (30cp + WS)
+        model.arithm(modulVars[13].div(coursesPerTerm).intVar(), ">", 1).post(); // DBA (30cp + WS)
+        model.arithm(modulVars[14].div(coursesPerTerm).intVar(), ">", 1).post(); // MCI (30cp + WS)
+        model.arithm(modulVars[15].div(coursesPerTerm).intVar(), ">", 2).post(); // SPIN1 (50cp + SS)
+        model.arithm(modulVars[16].div(coursesPerTerm).intVar(), ">", 2).post(); // IDB (50cp + SS)
+        model.arithm(modulVars[17].div(coursesPerTerm).intVar(), ">", 2).post(); // INP (50cp + SS)
+        model.arithm(modulVars[18].div(coursesPerTerm).intVar(), ">", 1).post(); // WM1 (50cp/70cp)
+        model.arithm(modulVars[19].div(coursesPerTerm).intVar(), ">", 1).post(); // WM2 (50cp/70cp)
+        model.arithm(modulVars[20].div(coursesPerTerm).intVar(), ">", 3).post(); // SPIN2 (50cp + SPIN1)
+        model.arithm(modulVars[21].div(coursesPerTerm).intVar(), ">", 1).post(); // PPR (70cp + WS)
+        model.arithm(modulVars[22].div(coursesPerTerm).intVar(), ">", 1).post(); // WM3 (50cp/70cp)
+        model.arithm(modulVars[23].div(coursesPerTerm).intVar(), ">", 1).post(); // WM4 (50cp/70cp)
+        model.arithm(modulVars[24].div(coursesPerTerm).intVar(), ">", 1).post(); // WM5 (50cp/70cp)
+        model.arithm(modulVars[25].div(coursesPerTerm).intVar(), ">", 4).post(); // BAIN (150cp)
+        model.arithm(modulVars[26].div(coursesPerTerm).intVar(), ">", 4).post(); // KBIN (150cp)
+        model.arithm(modulVars[27].div(coursesPerTerm).intVar(), ">", 2).post(); // PXP (90cp + SS)
 
 //        IntVar[] cpCounts = new IntVar[5];
 //        for (int i = 10; i <= 14; i++) {  // "BSY", "INS", "SWT", "DBA", "MCI"
@@ -291,8 +291,8 @@ public class CourseScheduling_IndexBased {
         // BSY
 //        IntVar cps = model.intVar(0);
 //        for (int i = 0; i < numberOfCourses; i++) {
-//            IntVar rowI = modulVars[i].div(modsPerSem).intVar();
-//            IntVar rowM = modulVars[10].div(modsPerSem).intVar();
+//            IntVar rowI = modulVars[i].div(coursesPerTerm).intVar();
+//            IntVar rowM = modulVars[10].div(coursesPerTerm).intVar();
 //            model.ifThen(
 //                    model.arithm(rowI, "<", rowM),
 //                    cps = model.intOffsetView(cps, 2)
@@ -300,14 +300,14 @@ public class CourseScheduling_IndexBased {
 //            BoolVar passed = model.arithm(rowI, "<", rowM).reify(); // modul_i.row < BSY.row
 //        }
 
-        IntVar[] points = model.intVarArray("points", maxSems * modsPerSem, 0, 15, true);
+        IntVar[] points = model.intVarArray("points", maxTerms * coursesPerTerm, 0, 15, true);
 //        for (int i = 0; i < numberOfCourses; i++) {
 //            model.element(cpVars[i], points, modulVars[i]).post();
 //        }
 //        model.sum(points[j], ">=", 15).post();
 
         for (int i = 0; i < numberOfCourses; i++) {
-            for (int j = 0; j < maxSems * modsPerSem; j++) {
+            for (int j = 0; j < maxTerms * coursesPerTerm; j++) {
 //                model.ifThen(
 //                        model.arithm(modulVars[i], "=", j),
 //                        model.arithm(points[j], "=", achievableCreditPoints[i])
@@ -339,7 +339,7 @@ public class CourseScheduling_IndexBased {
 //        model.setObjective(Model.MINIMIZE, modulVars[25]);
 //        Solution solution = model.getSolver().findOptimalSolution(modulVars[25], Model.MINIMIZE);
 
-        String[] output = new String[maxSems * modsPerSem];
+        String[] output = new String[maxTerms * coursesPerTerm];
         if (solution != null) {
             String result = "";
             String[] resultArray = solution.toString().split(",");
@@ -363,10 +363,10 @@ public class CourseScheduling_IndexBased {
             for (IntVar modulVar : modulVars) {
                 output[solution.getIntVal(modulVar)] = modulVar.getName();
             }
-            for (int i = 0; i < maxSems; i++) {
+            for (int i = 0; i < maxTerms; i++) {
                 String mods = "";
-                int start = i * modsPerSem;
-                for (int j = start; j < (start + modsPerSem); j++) {
+                int start = i * coursesPerTerm;
+                for (int j = start; j < (start + coursesPerTerm); j++) {
                     String modulName = (output[j] == null) ? "" : output[j];
                     mods += StringPadding.rightPad(modulName, 5) + "   ";
                 }
