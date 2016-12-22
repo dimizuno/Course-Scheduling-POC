@@ -2,26 +2,32 @@ import org.chocosolver.solver.Model;
 import org.chocosolver.solver.Solution;
 import org.chocosolver.solver.Solver;
 import org.chocosolver.solver.constraints.Constraint;
-import org.chocosolver.solver.constraints.nary.alldifferent.conditions.Condition;
+import org.chocosolver.solver.exception.ContradictionException;
+import org.chocosolver.solver.search.loop.monitors.IMonitorOpenNode;
+import org.chocosolver.solver.search.loop.monitors.IMonitorSolution;
 import org.chocosolver.solver.variables.BoolVar;
 import org.chocosolver.solver.variables.IntVar;
 import org.chocosolver.solver.variables.SetVar;
-import org.chocosolver.util.tools.ArrayUtils;
+import org.chocosolver.solver.variables.Variable;
+import org.chocosolver.solver.variables.impl.BitsetIntVarImpl;
+import org.chocosolver.solver.variables.impl.IntervalIntVarImpl;
 import util.StringPadding;
 
 import java.util.Arrays;
 import java.util.List;
 
 /**
- * Created by the two world leading experts in CP: asekulsk & dkotlovs.
+ * Created by the two world leading experts in CS: asekulsk & dkotlovs.
  */
 public class CourseScheduling_RowBased {
 
     public static void main(String[] args) {
-        solveModule();
+        solveProblem();
     }
 
-    private static void solveModule() {
+    private static void solveProblem() {
+
+        long startTime = System.nanoTime();
 
         // Maximum courses per term
         int coursesPerTerm = 3;
@@ -34,14 +40,14 @@ public class CourseScheduling_RowBased {
         // MODEL: //
         ////////////
 
-        // x-axis: number of modules per semester (curses per term)
+        // x-axis: number of curses per term
         // y-axis: number of necessary terms over all
         //
         //         x0   x1   x2   x3   ...
-        //    y0  0.GMI  1.EPR  2.LDS   -
-        //    y1  3.MIN  4.TENI 5.TGI   -
-        //    y2  6.OPR  7.ADS  8.THI   -
-        //    y3  9...   10...  11...   -
+        //    y0   GMI  EPR  LDS  -
+        //    y1   MIN  OPR  ADS  -
+        //    y2   INS  SWT  DBA  -
+        //    y3   ...  ...  ...  -
         //    y4
         //    ...
 
@@ -63,12 +69,12 @@ public class CourseScheduling_RowBased {
         int numberOfCourses = modules.size();
 
         // CS-Model
-        Model model = new Model("CourseScheduling");
+        Model model = new Model("CourseScheduling_RowBased");
 
         // Variables: modules
         IntVar[] modulVars = new IntVar[numberOfCourses];
         for (int i = 0; i < numberOfCourses; i++) {
-            modulVars[i] = model.intVar(modules.get(i), 0, maxTerms - 1);
+            modulVars[i] = model.intVar(modules.get(i), 0, maxTerms - 1, false);
         }
 
         // Variables: credit points
@@ -79,39 +85,10 @@ public class CourseScheduling_RowBased {
                 6, 6, 6, 6, 6,  // SPIN1, IDB, INP, WM1, WM2
                 6, 6, 6, 6, 6,  // SPIN2, PPR, WM3, WM4, WM5,
                 12, 3, 15};     // BAIN, KBIN, PXP
-        IntVar[] cpVars = new IntVar[numberOfCourses];
-        cpVars[0] = model.intVar(5);    // TGI
-        cpVars[1] = model.intVar(5);    // TENI
-        cpVars[2] = model.intVar(7);    // GMI
-        cpVars[3] = model.intVar(7);    // EPR
-        cpVars[4] = model.intVar(6);    // LDS
-        cpVars[5] = model.intVar(6);    // MIN
-        cpVars[6] = model.intVar(5);    // REN
-        cpVars[7] = model.intVar(7);    // OPR
-        cpVars[8] = model.intVar(6);    // ADS
-        cpVars[9] = model.intVar(6);    // THI
-        cpVars[10] = model.intVar(6);   // BSY              | premise: 30cp
-        cpVars[11] = model.intVar(6);   // INS              | premise: 30cp
-        cpVars[12] = model.intVar(6);   // SWT              | premise: 30cp
-        cpVars[13] = model.intVar(6);   // DBA              | premise: 30cp
-        cpVars[14] = model.intVar(6);   // MCI              | premise: 30cp
-        cpVars[15] = model.intVar(6);   // SPIN1 (6 of 12)  | premise: 50cp
-        cpVars[16] = model.intVar(6);   // IDB              | premise: 50cp
-        cpVars[17] = model.intVar(6);   // INP              | premise: 50cp
-        cpVars[18] = model.intVar(6);   // WM1              | premise: 50cp
-        cpVars[19] = model.intVar(6);   // WM2              | premise: 50cp
-        cpVars[20] = model.intVar(6);   // SPIN2 (6 of 12)  | premise: 50cp
-        cpVars[21] = model.intVar(6);   // PPR              | premise: 70cp
-        cpVars[22] = model.intVar(6);   // WM3              | premise: 70cp
-        cpVars[23] = model.intVar(6);   // WM4              | premise: 70cp
-        cpVars[24] = model.intVar(6);   // WM5              | premise: 70cp
-        cpVars[25] = model.intVar(12);  // BAIN             | premise: 150cp
-        cpVars[26] = model.intVar(3);   // KBIN             | premise: 150cp
-        cpVars[27] = model.intVar(15);  // PPX              | premise: 90cp
 
         int[] courseNumbers = new int[]{0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27};
         SetVar[] scheduledCourses = model.setVarArray("scheduledCourses", maxTerms, new int[]{}, courseNumbers);
-        IntVar[] points = model.intVarArray(maxTerms, 15, 21);
+        IntVar[] points = model.intVarArray(maxTerms, 15, 21); // consider to make a 0-100 bound and set two constraints >= 15 and <= 21 (more efficient)
 
         // BWIN, WS, 6CP
         // BV, WS, 6CP (GMI, EPR, MIN, OPR, ADS, PPR)
@@ -349,14 +326,41 @@ public class CourseScheduling_RowBased {
         // SOLVING: //
         //////////////
 
-        Solver solver = model.getSolver();
-        solver.showShortStatistics();
-        Solution solution = solver.findSolution();
+        final Solver solver = model.getSolver();
 
+        solver.showShortStatistics();
+        solver.showStatistics();
+        solver.showDecisions();
+        solver.showContradiction();
+
+//        solver.plugMonitor(new IMonitorOpenNode() {
+//            public void beforeOpenNode() {
+//                System.out.println(Arrays.toString(solver.getSearch().getVariables()));
+//                Variable[] variables = solver.getSearch().getVariables();
+//                BitsetIntVarImpl var = (BitsetIntVarImpl) variables[1];
+//                IntervalIntVarImpl var = (IntervalIntVarImpl) variables[1];
+//                System.out.println(variables[1].getName() + variables[1].getClass().getName());
+//            }
+//        });
+
+        Solution solution = solver.findSolution();
+        printSolution(solution, maxTerms, modulVars);
+
+//        solver.limitSolution(100);
+//        List<Solution> solutions = solver.findAllSolutions();
+//        if(solutions != null) {
+//            System.out.println("Number of all solutions: " + solutions.size());
+//        }
+
+        long estimatedTime = System.nanoTime() - startTime;
+        long seconds = estimatedTime / 1000000000;
+        System.out.println("Estimated time: " + seconds / 60 + " min");
+    }
+
+    private static void printSolution(Solution solution, int maxTerms, IntVar[] modulVars) {
         String[] output = new String[maxTerms];
         if (solution != null) {
             for (IntVar modulVar : modulVars) {
-                String rowString = output[solution.getIntVal(modulVar)];
                 int row = solution.getIntVal(modulVar);
                 String modulName = StringPadding.rightPad(modulVar.getName(), 5);
                 if (output[row] != null) {
@@ -375,12 +379,6 @@ public class CourseScheduling_RowBased {
         } else {
             System.out.println("NO SOLUTION FOUND!");
         }
-
-//        List<Solution> solutions = solver.findAllSolutions();
-//        if(solutions != null) {
-//            System.out.println(solutions.size());
-//        }
-
     }
 
 }

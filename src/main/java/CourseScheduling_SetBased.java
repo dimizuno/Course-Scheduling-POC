@@ -55,7 +55,7 @@ public class CourseScheduling_SetBased {
 //        courseToTermRestrictions[9] = new int[]{5,6,7,8,9,15,16,17,18,19,22,23,24,25,26,27};
 
 
-        Model model = new Model("CourseScheduling");
+        Model model = new Model("CourseScheduling_SetBased");
 
         SetVar union = model.setVar("union", courseNumbers);
 
@@ -67,7 +67,7 @@ public class CourseScheduling_SetBased {
 
         IntVar[] creditPoints = new IntVar[maxTerms];
         for (int i = 0; i < maxTerms; i++) {
-            creditPoints[i] = model.intVar("creditPoints_"+i, 15, 21, true);
+            creditPoints[i] = model.intVar("creditPoints_"+i, 15, 21, true); // consider false !!!
         }
 
 //        int[] minTerm = new int[]{
@@ -369,6 +369,7 @@ public class CourseScheduling_SetBased {
         //////////////
 
         Solver solver = model.getSolver();
+        solver.showStatistics();
         solver.showShortStatistics();
         Solution solution = solver.findSolution();
 

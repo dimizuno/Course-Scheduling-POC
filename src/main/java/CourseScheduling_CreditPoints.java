@@ -40,7 +40,7 @@ public class CourseScheduling_CreditPoints {
                 12, 3, 15};     // BAIN, KBIN, PXP
 
         // A new model instance
-        Model model = new Model("CourseScheduling");
+        Model model = new Model("CourseScheduling_CreditPoints");
 
         // VARIABLES
         // a course is either scheduled or not
@@ -59,23 +59,30 @@ public class CourseScheduling_CreditPoints {
             points[i] = model.intVarArray("points_"+i, maxCoursesPerTerm, 0, 15, true);
         }
 
+        // accumulated points
+        IntVar[] accPoints = new IntVar[maxTerms];
+        for (int i = 0; i < maxTerms; i++) {
+//            accPoints[i] = model.intVar("accPoints"+i, 15, 21, true); // consider false !!!
+            accPoints[i] = model.intVar("accPoints"+i, 0, 100, false); // consider false !!!
+        }
+
         // CONSTRAINTS
         model.allDifferentExcept0(terms).post();
         for (int j = 0; j < maxTerms; j++) {
             // a course is scheduled, if it is 'bound' to a store
             for (int i = 0; i < maxCoursesPerTerm; i++) {
-                model.element(model.intVar(1), courses, terms[(j * maxCoursesPerTerm) + i], 0).post();
+//                model.element(model.intVar(1), courses, terms[(j * maxCoursesPerTerm) + i], 0).post();
                 model.element(points[j][i], achievableCreditPoints, terms[(j * maxCoursesPerTerm) + i], 0).post(); // Compute credit points for each term
             }
+            model.sum(points[j], "=", accPoints[j]).post();
             model.sum(points[j], ">=", 15).post();
+            model.sum(points[j], "<=", 21).post();
         }
 
         Solver solver = model.getSolver();
+//        solver.showStatistics();
         solver.showShortStatistics();
         Solution solution = solver.findSolution();
-        if (solution != null) {
-            System.out.println(solution.toString());
-        }
 
         String[] output = new String[maxTerms];
         if (solution != null) {
