@@ -9,7 +9,8 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- * Created by Dimi on 30.10.2016.
+ * Course Scheduling problem. This is not a complete solution but an example for successful credit points calculations
+ * (see documentation). It is loosely based on the Warehouse example from the choco tutorials.
  */
 public class CourseScheduling_CreditPoints {
 
@@ -19,7 +20,13 @@ public class CourseScheduling_CreditPoints {
 
     private static void solveProblem() {
 
-        List<String> modules = Arrays.asList( "____", // 0
+
+
+        ////////////
+        // MODEL: //
+        ////////////
+
+        List<String> courseNames = Arrays.asList( "____", // 0
                 "TGI", "TENI", "GMI", "EPR", "LDS", // 1, 2, 3, 4, 5
                 "MIN", "REN", "OPR", "ADS", "THI", // 6, 7, 8, 9, 10
                 "BSY", "INS", "SWT", "DBA", "MCI", // 11, 12, 13, 14, 15
@@ -62,11 +69,16 @@ public class CourseScheduling_CreditPoints {
         // accumulated points
         IntVar[] accPoints = new IntVar[maxTerms];
         for (int i = 0; i < maxTerms; i++) {
-//            accPoints[i] = model.intVar("accPoints"+i, 15, 21, true); // consider false !!!
-            accPoints[i] = model.intVar("accPoints"+i, 0, 100, false); // consider false !!!
+//            accPoints[i] = model.intVar("accPoints"+i, 15, 21, true);
+            accPoints[i] = model.intVar("accPoints"+i, 0, 100, false);
         }
 
-        // CONSTRAINTS
+
+
+        //////////////////
+        // CONSTRAINTS: //
+        //////////////////
+
         model.allDifferentExcept0(terms).post();
         for (int j = 0; j < maxTerms; j++) {
             // a course is scheduled, if it is 'bound' to a store
@@ -79,8 +91,14 @@ public class CourseScheduling_CreditPoints {
             model.sum(points[j], "<=", 21).post();
         }
 
+
+
+
+        //////////////
+        // SOLVING: //
+        //////////////
+
         Solver solver = model.getSolver();
-//        solver.showStatistics();
         solver.showShortStatistics();
         Solution solution = solver.findSolution();
 
@@ -89,11 +107,11 @@ public class CourseScheduling_CreditPoints {
             for (int i = 0; i < maxTerms; i++) {
                 int start = i * maxCoursesPerTerm;
                 for (int j = start; j < (start + maxCoursesPerTerm); j++) {
-                    String modulName = StringPadding.rightPad(modules.get(terms[j].getValue()), 5);
+                    String courseName = StringPadding.rightPad(courseNames.get(terms[j].getValue()), 5);
                     if (output[i] != null) {
-                        output[i] += modulName + "   ";
+                        output[i] += courseName + "   ";
                     } else {
-                        output[i] = modulName + "   ";
+                        output[i] = courseName + "   ";
                     }
                 }
                 System.out.println(StringPadding.leftPad("" + (i + 1), 2) + ". Sem:   " + output[i]);

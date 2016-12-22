@@ -2,8 +2,6 @@ import org.chocosolver.solver.Model;
 import org.chocosolver.solver.Solution;
 import org.chocosolver.solver.Solver;
 import org.chocosolver.solver.constraints.Constraint;
-import org.chocosolver.solver.exception.ContradictionException;
-import org.chocosolver.solver.objective.ParetoOptimizer;
 import org.chocosolver.solver.variables.BoolVar;
 import org.chocosolver.solver.variables.IntVar;
 import org.chocosolver.solver.variables.SetVar;
@@ -13,18 +11,24 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- * Created by the two world leading experts in CP: asekulsk & dkotlovs.
+ * Course Scheduling problem. Solved with an set based solution (see documentation).
  */
 public class CourseScheduling_SetBased {
 
     public static void main(String[] args) {
-        solveModule();
+        solveProblem();
     }
 
-    public static void solveModule() {
+    public static void solveProblem() {
 
         int maxTerms = 10;
         int numberOfCourses = 28;
+
+
+
+        ////////////
+        // MODEL: //
+        ////////////
 
         List<String> courseNames = Arrays.asList(
                 "TGI", "TENI", "GMI", "EPR", "LDS", // 0, 1, 2, 3, 4
@@ -35,12 +39,6 @@ public class CourseScheduling_SetBased {
                 "BAIN", "KBIN", "PXP"); //25, 26, 27
 
         int[] courseNumbers = new int[]{0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27};
-
-
-
-        ////////////////
-        // VARIABLES: //
-        ////////////////
 
 //        int[][] courseToTermRestrictions = new int[maxTerms][];
 //        courseToTermRestrictions[0] = new int[]{0,1,2,3,4};
@@ -194,7 +192,7 @@ public class CourseScheduling_SetBased {
         model.notMember(27, terms[0]).post();
 
 
-        oldCPVersion(model, maxTerms, creditPoints, terms);
+        oldCPVersion(model, maxTerms, creditPoints, terms); // for some reason the old code is faster (to be examined)
 
 //        // Ensure that for courses, that demand a minimum number of credit points, those are achieved
 //        for (int i = 1; i < maxTerms; i++) {
@@ -394,35 +392,6 @@ public class CourseScheduling_SetBased {
         } else {
             System.out.println("NO SOLUTION FOUND!");
         }
-
-//        // create an object that will store the best solutions and remove dominated ones
-//        ParetoOptimizer po = new ParetoOptimizer(Model.MAXIMIZE, creditPoints);
-//        solver.plugMonitor(po);
-//
-//        // optimization
-//        while(solver.solve());
-//
-//        // retrieve the pareto front
-//        List<Solution> paretoFront = po.getParetoFront();
-//        System.out.println("The pareto front has " + paretoFront.size() + " solutions : ");
-//        for(Solution solution : paretoFront){
-//            for (int term = 0; term < maxTerms; term++) {
-//                int[] courses = solution.getSetVal(terms[term]);
-//                for (int i = 0; i < courses.length; i++) {
-//                    String courseName = StringPadding.rightPad(courseNames.get(courses[i]), 5);
-//                    if (output[term] != null) {
-//                        output[term] += courseName + "   ";
-//                    } else {
-//                        output[term] = courseName + "   ";
-//                    }
-//                }
-//                if (output[term] != null) {
-//                    System.out.println(StringPadding.leftPad("" + (term + 1), 2) + ". Sem:   " + output[term]);
-//                } else {
-//                    System.out.println(StringPadding.leftPad("" + (term + 1), 2) + ". Sem:   ");
-//                }
-//            }
-//        }
 
 //        List<Solution> solutions = solver.findAllSolutions();
 //        if(solutions != null) {

@@ -1,14 +1,7 @@
 package exp;
 
 import org.chocosolver.solver.Model;
-import org.chocosolver.solver.ResolutionPolicy;
-import org.chocosolver.solver.Solution;
 import org.chocosolver.solver.Solver;
-import org.chocosolver.solver.search.strategy.selectors.values.IntDomainMiddle;
-import org.chocosolver.solver.search.strategy.selectors.variables.FirstFail;
-import org.chocosolver.solver.search.strategy.selectors.variables.Smallest;
-import org.chocosolver.solver.search.strategy.selectors.variables.VariableSelectorWithTies;
-import org.chocosolver.solver.search.strategy.strategy.IntStrategy;
 import org.chocosolver.solver.variables.BoolVar;
 import org.chocosolver.solver.variables.IntVar;
 import org.chocosolver.util.tools.ArrayUtils;
@@ -16,7 +9,7 @@ import org.chocosolver.util.tools.ArrayUtils;
 import java.util.Arrays;
 
 /**
- * Created by Dimi on 26.10.2016.
+ * This is an example from the choco tutorials: http://choco-tuto.readthedocs.io/en/latest/src/401.description.html
  */
 public class Warehouse {
 
