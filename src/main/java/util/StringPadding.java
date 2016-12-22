@@ -18,6 +18,12 @@ package util;
  *
  *
  */
+
+/**
+ * Sources:
+ * - http://www.java2s.com/Tutorial/Java/0040__Data-Type/RightpadaStringwithspaces.htm
+ * - http://www.java2s.com/Tutorial/Java/0040__Data-Type/LeftpadaStringwithspaces.htm
+ */
 public class StringPadding {
 
     /**
