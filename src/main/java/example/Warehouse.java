@@ -1,4 +1,4 @@
-package exp;
+package example;
 
 import org.chocosolver.solver.Model;
 import org.chocosolver.solver.Solver;

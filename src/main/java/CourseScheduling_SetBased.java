@@ -12,6 +12,8 @@ import java.util.List;
 
 /**
  * Course Scheduling problem. Solved with an set based solution (see documentation).
+ *
+ * @authors Dimitri Kotlovsky, Andreas Sekulski
  */
 public class CourseScheduling_SetBased {
 

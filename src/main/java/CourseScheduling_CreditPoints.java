@@ -11,6 +11,8 @@ import java.util.List;
 /**
  * Course Scheduling problem. This is not a complete solution but an example for successful credit points calculations
  * (see documentation). It is loosely based on the Warehouse example from the choco tutorials.
+ *
+ * @authors Dimitri Kotlovsky, Andreas Sekulski
  */
 public class CourseScheduling_CreditPoints {
 

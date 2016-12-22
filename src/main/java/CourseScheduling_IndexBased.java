@@ -13,6 +13,8 @@ import java.util.List;
 /**
  * Course Scheduling problem. Solved with an index based solution (see documentation). This is an already updated
  * version that has constraints for credit points requirements included.
+ *
+ * @authors Dimitri Kotlovsky, Andreas Sekulski
  */
 public class CourseScheduling_IndexBased {
 

@@ -18,6 +18,8 @@ import java.util.List;
 
 /**
  * Course Scheduling problem. Solved with an row based solution (see documentation). This is best solution so far.
+ *
+ * @authors Dimitri Kotlovsky, Andreas Sekulski
  */
 public class CourseScheduling_RowBased {
 
